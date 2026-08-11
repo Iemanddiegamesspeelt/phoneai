@@ -10,7 +10,7 @@ on:
 jobs:
   build:
     name: Build Unsigned IPA
-    runs-on: macos-14
+    runs-on: macos-15
 
     steps:
       - name: Checkout Repository
@@ -23,7 +23,9 @@ jobs:
         run: brew install xcodegen
 
       - name: Generate Xcode Project
-        run: xcodegen generate --spec project.yml
+        run: |
+          rm -rf PocketAI.xcodeproj
+          xcodegen generate --spec project.yml
 
       - name: Build App
         run: |
