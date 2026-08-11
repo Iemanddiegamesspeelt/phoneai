@@ -35,7 +35,7 @@ jobs:
                      clean build \
                      CODE_SIGNING_ALLOWED=NO \
                      CODE_SIGNING_REQUIRED=NO \
-                     CODE_SIGN_IDENTITY=""
+                     CODE_SIGN_IDENTITY="" > xcode_build.log 2>&1 || (cat xcode_build.log && exit 1)
 
       - name: Package IPA
         run: |
