@@ -27,9 +27,7 @@ public actor LocalTTSEngine: NSObject, TTSInferenceEngine {
         modelPath = path
         
         // Initialize AVSpeechSynthesizer
-        await MainActor.run {
-            self.synthesizer = AVSpeechSynthesizer()
-        }
+        self.synthesizer = AVSpeechSynthesizer()
     }
 
     public func unloadModel() async throws {
@@ -37,10 +35,8 @@ public actor LocalTTSEngine: NSObject, TTSInferenceEngine {
         modelPath = nil
         isCancelled = false
         isGenerating = false
-        await MainActor.run {
-            self.synthesizer?.stopSpeaking(at: .immediate)
-            self.synthesizer = nil
-        }
+        self.synthesizer?.stopSpeaking(at: .immediate)
+        self.synthesizer = nil
     }
 
     public func isModelLoaded() async -> Bool {
@@ -95,10 +91,8 @@ public actor LocalTTSEngine: NSObject, TTSInferenceEngine {
             utterance.voice = AVSpeechSynthesisVoice(language: "en-US")
         }
 
-        // Trigger synthesis on the MainActor since AVSpeechSynthesizer acts on main threads
-        await MainActor.run {
-            self.synthesizer?.speak(utterance)
-        }
+        // Trigger synthesis
+        self.synthesizer?.speak(utterance)
 
         // Generate audio data representation (Simulated WAV for file output compatibility)
         let sampleRate = 22050
@@ -115,9 +109,7 @@ public actor LocalTTSEngine: NSObject, TTSInferenceEngine {
         isGenerating = false
         
         if isCancelled {
-            await MainActor.run {
-                self.synthesizer?.stopSpeaking(at: .immediate)
-            }
+            self.synthesizer?.stopSpeaking(at: .immediate)
             throw InferenceError(.inferenceCancelled)
         }
 

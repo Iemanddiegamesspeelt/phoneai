@@ -143,7 +143,7 @@ struct HomeDashboardView: View {
                 .padding(15)
                 .glassCard(cornerRadius: 12)
             } else {
-                ForEach(vm.models.filter { vm.loadedModelIds.contains($0.id) }) { model in
+                ForEach(vm.loadedModels) { model in
                     HStack(spacing: 12) {
                         EngineKindBadge(kind: model.engineKind)
                         
@@ -184,7 +184,7 @@ struct HomeDashboardView: View {
                 .foregroundStyle(.secondary)
 
             VStack(spacing: 0) {
-                if let profile = vm.aiEngine.hardwareProfile {
+                if let profile = vm.hardwareProfile {
                     infoRow(title: "Device Model", value: profile.deviceModel, icon: "iphone")
                     Divider().padding(.leading, 40)
                     infoRow(title: "iOS Version", value: profile.iosVersion, icon: "info.circle")
@@ -210,7 +210,7 @@ struct HomeDashboardView: View {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.subheadline)
-                .foregroundStyle(.pocketPrimary)
+                .foregroundStyle(Color.pocketPrimary)
                 .frame(width: 24, height: 24)
                 .background(Color.pocketPrimary.opacity(0.12))
                 .clipShape(RoundedRectangle(cornerRadius: 6))

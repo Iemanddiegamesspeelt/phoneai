@@ -192,7 +192,7 @@ struct CatalogListView: View {
                             .tint(.pocketPrimary)
                         Text(task.percentFormatted)
                             .font(.system(size: 8, weight: .bold, design: .monospaced))
-                            .foregroundStyle(.pocketPrimary)
+                            .foregroundStyle(Color.pocketPrimary)
                     }
                 } else {
                     // Not downloaded
@@ -201,7 +201,7 @@ struct CatalogListView: View {
                     }) {
                         Image(systemName: "arrow.down.circle")
                             .font(.title3)
-                            .foregroundStyle(.pocketPrimary)
+                            .foregroundStyle(Color.pocketPrimary)
                     }
                 }
             }
@@ -217,7 +217,7 @@ struct CatalogListView: View {
     // MARK: - Helper Badge
     @ViewBuilder
     private func compatibilityBadge(for model: ModelCatalogEntry) -> some View {
-        let result = vm.aiEngine.checkCompatibility(model: model)
+        let result = vm.modelCompatibilities[model.id] ?? .compatible
         switch result {
         case .compatible:
             StatusBadge("COMPATIBLE", color: .pocketSuccess)
@@ -262,7 +262,7 @@ struct ModelDetailSheet: View {
                         Text("Hardware Compatibility")
                             .font(.headline)
                         
-                        let result = vm.aiEngine.checkCompatibility(model: model)
+                        let result = vm.modelCompatibilities[model.id] ?? .compatible
                         HStack(spacing: 8) {
                             Image(systemName: result.statusIcon)
                                 .foregroundStyle(compatibilityColor(result))

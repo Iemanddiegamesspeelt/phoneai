@@ -102,7 +102,7 @@ public actor LocalImageEngine: ImageInferenceEngine {
 
                     // Generate a unique beautiful gradient image based on the prompt
                     let imageSeed = seed + index
-                    if let imageData = self.renderDynamicImage(prompt: prompt, width: width, height: height, seed: imageSeed) {
+                    if let imageData = await self.renderDynamicImage(prompt: prompt, width: width, height: height, seed: imageSeed) {
                         continuation.yield(.imageReady(imageData: imageData, index: index))
                     } else {
                         continuation.finish(throwing: InferenceError(.inferenceFailed, message: "Could not render generated image."))

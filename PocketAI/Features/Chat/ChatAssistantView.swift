@@ -78,7 +78,7 @@ struct ChatAssistantView: View {
             Spacer()
             Image(systemName: "bubble.left.and.bubble.right.fill")
                 .font(.system(size: 64))
-                .foregroundStyle(.pocketPrimary)
+                .foregroundStyle(Color.pocketPrimary)
             
             Text("No Text Model Loaded")
                 .font(.title3)
@@ -130,7 +130,7 @@ struct ChatAssistantView: View {
                 Text("Chatting with \(activeModelName)")
                     .font(.footnote)
                     .fontWeight(.bold)
-                    .foregroundStyle(.pocketPrimary)
+                    .foregroundStyle(Color.pocketPrimary)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
                     .background(Color.pocketPrimary.opacity(0.12))
@@ -203,7 +203,7 @@ struct ChatAssistantView: View {
                     }) {
                         Image(systemName: "stop.circle.fill")
                             .font(.system(size: 32))
-                            .foregroundStyle(.pocketError)
+                            .foregroundStyle(Color.pocketError)
                     }
                 } else {
                     Button(action: {

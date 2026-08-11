@@ -132,14 +132,13 @@ public actor HardwareDetector {
 
     /// Detect device capabilities and return a snapshot profile.
     /// Caches the result so subsequent calls return instantly.
-    @MainActor
-    public func detectCapabilities() -> HardwareCapabilityProfile {
+    public func detectCapabilities() async -> HardwareCapabilityProfile {
         if let cached = cachedProfile { return cached }
 
         let profile = HardwareCapabilityProfile(
             deviceModel: Self.deviceModelIdentifier(),
-            deviceName: Self.deviceName(),
-            iosVersion: Self.iosVersion(),
+            deviceName: await Self.deviceName(),
+            iosVersion: await Self.iosVersion(),
             totalRAMBytes: Self.totalRAMBytes(),
             processorCount: ProcessInfo.processInfo.processorCount,
             activeProcessorCount: ProcessInfo.processInfo.activeProcessorCount,
@@ -182,6 +181,7 @@ public actor HardwareDetector {
     }
 
     /// User-facing device name (e.g., "Tim's iPhone").
+    @MainActor
     private static func deviceName() -> String {
         #if canImport(UIKit)
         return UIDevice.current.name
@@ -191,6 +191,7 @@ public actor HardwareDetector {
     }
 
     /// iOS version string.
+    @MainActor
     private static func iosVersion() -> String {
         #if canImport(UIKit)
         return UIDevice.current.systemVersion

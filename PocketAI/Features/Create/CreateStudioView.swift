@@ -127,7 +127,7 @@ struct CreateStudioView: View {
                             Text("Denoising... \(Int(vm.imageProgress * 100))%")
                                 .font(.caption2)
                                 .fontWeight(.bold)
-                                .foregroundStyle(.pocketPrimary)
+                                .foregroundStyle(Color.pocketPrimary)
                             
                             Button("Cancel", action: {
                                 Task { await vm.aiEngine.cancelInference(engineKind: .image) }
@@ -235,7 +235,7 @@ struct CreateStudioView: View {
                             }
                         }
                     }), matching: .images) {
-                        Label("Select Image", systemName: "photo")
+                        Label("Select Image", systemImage: "photo")
                             .frame(maxWidth: .infinity)
                             .padding(10)
                             .background(Color.pocketPrimary.opacity(0.12))
@@ -323,7 +323,7 @@ struct CreateStudioView: View {
                     if vm.isRecording {
                         Image(systemName: "waveform")
                             .font(.system(size: 40))
-                            .foregroundStyle(.pocketError)
+                            .foregroundStyle(Color.pocketError)
                             .scaleEffect(vm.isRecording ? 1.2 : 1.0)
                             .animation(.easeInOut(duration: 0.5).repeatForever(), value: vm.isRecording)
                         
@@ -480,7 +480,7 @@ struct CreateStudioView: View {
         VStack(spacing: 15) {
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.system(size: 40))
-                .foregroundStyle(.pocketWarning)
+                .foregroundStyle(Color.pocketWarning)
             Text(message)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)

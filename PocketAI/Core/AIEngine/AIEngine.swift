@@ -81,7 +81,6 @@ public actor AIEngine {
 
     /// Initialize the engine: detect hardware, start monitoring, register engines.
     /// Call this once at app startup.
-    @MainActor
     public func initialize() async {
         guard !isInitialized else { return }
 
@@ -337,14 +336,14 @@ public actor AIEngine {
         systemPrompt: String? = nil,
         history: [ChatMessage] = [],
         parameters: TextGenerationParameters = .default
-    ) -> AsyncThrowingStream<TextGenerationEvent, Error> {
+    ) async -> AsyncThrowingStream<TextGenerationEvent, Error> {
         guard let engine = textEngine else {
             return AsyncThrowingStream { continuation in
                 continuation.finish(throwing: InferenceError(.backendUnavailable, message: "No text engine registered."))
             }
         }
 
-        return engine.generate(
+        return await engine.generate(
             prompt: prompt,
             systemPrompt: systemPrompt,
             history: history,
@@ -359,13 +358,13 @@ public actor AIEngine {
         prompt: String,
         negativePrompt: String? = nil,
         parameters: ImageGenerationParameters
-    ) -> AsyncThrowingStream<ImageGenerationEvent, Error> {
+    ) async -> AsyncThrowingStream<ImageGenerationEvent, Error> {
         guard let engine = imageEngine else {
             return AsyncThrowingStream { continuation in
                 continuation.finish(throwing: InferenceError(.backendUnavailable, message: "No image engine registered."))
             }
         }
-        return engine.generate(prompt: prompt, negativePrompt: negativePrompt, parameters: parameters)
+        return await engine.generate(prompt: prompt, negativePrompt: negativePrompt, parameters: parameters)
     }
 
     // MARK: - Vision Inference
@@ -375,13 +374,13 @@ public actor AIEngine {
         imageData: Data,
         query: String,
         parameters: TextGenerationParameters = .default
-    ) -> AsyncThrowingStream<TextGenerationEvent, Error> {
+    ) async -> AsyncThrowingStream<TextGenerationEvent, Error> {
         guard let engine = visionEngine else {
             return AsyncThrowingStream { continuation in
                 continuation.finish(throwing: InferenceError(.backendUnavailable, message: "No vision engine registered."))
             }
         }
-        return engine.analyze(imageData: imageData, query: query, parameters: parameters)
+        return await engine.analyze(imageData: imageData, query: query, parameters: parameters)
     }
 
     /// Classify an image with categories.
@@ -410,13 +409,13 @@ public actor AIEngine {
     public func transcribeSpeechStream(
         audioStream: AsyncStream<Data>,
         language: String? = nil
-    ) -> AsyncThrowingStream<TranscriptionSegment, Error> {
+    ) async -> AsyncThrowingStream<TranscriptionSegment, Error> {
         guard let engine = speechEngine else {
             return AsyncThrowingStream { continuation in
                 continuation.finish(throwing: InferenceError(.backendUnavailable, message: "No speech engine registered."))
             }
         }
-        return engine.transcribeStream(audioStream: audioStream, language: language)
+        return await engine.transcribeStream(audioStream: audioStream, language: language)
     }
 
     // MARK: - TTS Inference

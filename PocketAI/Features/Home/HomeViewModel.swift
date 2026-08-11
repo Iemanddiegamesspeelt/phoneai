@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import SwiftUI
+import AVFoundation
 
 @MainActor
 public final class HomeViewModel: ObservableObject {
@@ -12,7 +13,13 @@ public final class HomeViewModel: ObservableObject {
 
     // MARK: - Published State
     @Published public var models: [ModelCatalogEntry] = []
+    @Published public var hardwareProfile: HardwareCapabilityProfile? = nil
+    @Published public var modelCompatibilities: [String: CompatibilityResult] = [:]
     @Published public var downloadTasks: [String: DownloadTask] = [:]
+
+    public var loadedModels: [ModelCatalogEntry] {
+        models.filter { loadedModelIds.contains($0.id) }
+    }
     @Published public var installedModelIds: Set<String> = []
     @Published public var loadedModelIds: Set<String> = []
     @Published public var activeModelId: String?
@@ -354,7 +361,7 @@ public final class HomeViewModel: ObservableObject {
 
         Task {
             do {
-                let stream = aiEngine.generateText(
+                let stream = await aiEngine.generateText(
                     prompt: text,
                     systemPrompt: systemPrompt.isEmpty ? nil : systemPrompt,
                     history: chatHistory.dropLast(),
@@ -422,7 +429,7 @@ public final class HomeViewModel: ObservableObject {
 
         Task {
             do {
-                let stream = aiEngine.generateImage(prompt: prompt, parameters: params)
+                let stream = await aiEngine.generateImage(prompt: prompt, parameters: params)
                 for try await event in stream {
                     switch event {
                     case .stepCompleted(let step, let total):
@@ -463,7 +470,7 @@ public final class HomeViewModel: ObservableObject {
                 }
 
                 // Run visual Q&A stream
-                let stream = aiEngine.analyzeVision(imageData: data, query: query)
+                let stream = await aiEngine.analyzeVision(imageData: data, query: query)
                 for try await event in stream {
                     switch event {
                     case .token(let token):
@@ -589,19 +596,27 @@ public final class HomeViewModel: ObservableObject {
         let installedIds = await aiEngine.storageManager.installedModelIds()
         self.installedModelIds = Set(installedIds)
 
+        // Read hardware profile
+        self.hardwareProfile = await aiEngine.hardwareProfile
+
         // Read loaded models
         var loaded: Set<String> = []
+        var compatibilities: [String: CompatibilityResult] = [:]
         for model in models {
             let ready = await aiEngine.isReady(engineKind: model.engineKind)
-            if ready, let loadedId = await aiEngine.loadedModelId() {
+            if ready, let loadedId = await aiEngine.loadedModelId(engineKind: model.engineKind) {
                 // If model conforms to loadedId, track it
                 if model.id == loadedId {
                     loaded.insert(model.id)
                 }
             }
+            
+            // Check compatibility
+            compatibilities[model.id] = await aiEngine.checkCompatibility(model: model)
         }
         self.loadedModelIds = loaded
         self.activeModelId = loaded.first
+        self.modelCompatibilities = compatibilities
 
         // Read memory snapshot
         self.memorySnapshot = await aiEngine.memorySnapshot()
