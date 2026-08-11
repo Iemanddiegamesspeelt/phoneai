@@ -76,13 +76,6 @@ schemes:
       config: Debug
       destination:
         platform: iOS Simulator
-        id: ""
-        OS: 26.0
-        name: iPhone 17
-    test:
-      config: Debug
-      targets:
-        - PocketAITests
     profile:
       config: Profile
       specifyBuildConfiguration: true
