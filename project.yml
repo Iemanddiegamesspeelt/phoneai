@@ -2,8 +2,8 @@ name: PocketAI
 options:
   bundleIdPrefix: com.pocketai
   deploymentTarget:
-    iOS: "18.0"
-  xcodeVersion: "16.0"
+    iOS: "17.0"
+  xcodeVersion: "15.0"
   createEmptyGroups: true
   generateEmptyDirectories: true
 configs:
@@ -46,7 +46,7 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.pocketai.PocketAI
-        IPHONEOS_DEPLOYMENT_TARGET: "18.0"
+        IPHONEOS_DEPLOYMENT_TARGET: "17.0"
         TARGETED_DEVICE_FAMILY: "1,2"
         INFOPLIST_FILE: PocketAI/App/Info.plist
         LD_RUNPATH_SEARCH_PATHS: $(inherited) "@executable_path/Frameworks"
