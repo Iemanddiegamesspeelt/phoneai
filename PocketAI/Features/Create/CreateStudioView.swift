@@ -335,7 +335,7 @@ struct CreateStudioView: View {
                     } else {
                         Image(systemName: "mic.circle.fill")
                             .font(.system(size: 64))
-                            .foregroundStyle(.pocketPrimary)
+                            .foregroundStyle(Color.pocketPrimary)
                         
                         Button("Start Recording") {
                             vm.startAudioRecording()

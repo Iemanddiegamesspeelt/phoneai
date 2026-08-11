@@ -142,7 +142,7 @@ public actor MLXTextEngine: TextInferenceEngine {
                 // This allows the full UI to be built and tested independently.
 
                 // Placeholder: echo-based streaming to validate architecture
-                let response = self.generatePlaceholderResponse(for: prompt)
+                let response = await self.generatePlaceholderResponse(for: prompt)
                 let words = response.split(separator: " ")
 
                 for (index, word) in words.enumerated() {

@@ -153,7 +153,7 @@ public struct DownloadProgressBar: View {
                 Text(task.percentFormatted)
                     .font(.system(.caption, design: .monospaced))
                     .fontWeight(.bold)
-                    .foregroundStyle(.pocketPrimary)
+                    .foregroundStyle(Color.pocketPrimary)
             }
 
             // Progress bar
@@ -223,7 +223,7 @@ public struct ModelLoadingView: View {
 
             Button("Cancel", action: onCancel)
                 .font(.subheadline)
-                .foregroundStyle(.pocketError)
+                .foregroundStyle(Color.pocketError)
         }
         .padding(24)
         .glassCard()
@@ -246,7 +246,7 @@ public struct InferenceErrorView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundStyle(.pocketError)
+                    .foregroundStyle(Color.pocketError)
                 Text(error.errorDescription ?? "Error")
                     .font(.headline)
                 Spacer()

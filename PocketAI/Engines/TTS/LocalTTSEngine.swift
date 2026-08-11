@@ -135,9 +135,7 @@ public actor LocalTTSEngine: NSObject, TTSInferenceEngine {
 
     public func cancel() async {
         isCancelled = true
-        await MainActor.run {
-            self.synthesizer?.stopSpeaking(at: .immediate)
-        }
+        self.synthesizer?.stopSpeaking(at: .immediate)
     }
 
     private func setGenerating(_ value: Bool) {

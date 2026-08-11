@@ -8,7 +8,7 @@ struct SettingsDashboardView: View {
         Form {
             Section("Downloads & Network") {
                 Toggle(isOn: $vm.wifiOnlyDownloads) {
-                    Label("WiFi-Only Downloads", systemName: "wifi")
+                    Label("WiFi-Only Downloads", systemImage: "wifi")
                 }
             }
 
