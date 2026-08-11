@@ -30,16 +30,17 @@ jobs:
           xcodebuild -project PocketAI.xcodeproj \
                      -scheme PocketAI \
                      -configuration Release \
-                     -sdk iphoneos \
+                     -sdk iphonesimulator \
                      -derivedDataPath BuildData \
                      clean build \
                      CODE_SIGNING_ALLOWED=NO \
-                     CODE_SIGNING_REQUIRED=NO
+                     CODE_SIGNING_REQUIRED=NO \
+                     CODE_SIGN_IDENTITY=""
 
       - name: Package IPA
         run: |
           mkdir -p Payload
-          cp -r BuildData/Build/Products/Release-iphoneos/PocketAI.app Payload/
+          cp -r BuildData/Build/Products/Release-iphonesimulator/PocketAI.app Payload/
           zip -r PocketAI.ipa Payload
 
       - name: Upload IPA Artifact
