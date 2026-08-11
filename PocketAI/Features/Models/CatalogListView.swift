@@ -275,7 +275,7 @@ struct ModelDetailSheet: View {
                             ForEach(reasons, id: \.self) { reason in
                                 Text("• \(reason)")
                                     .font(.footnote)
-                                    .foregroundStyle(.pocketError)
+                                    .foregroundStyle(Color.pocketError)
                             }
                         }
 
@@ -283,7 +283,7 @@ struct ModelDetailSheet: View {
                             ForEach(warnings, id: \.self) { warning in
                                 Text("• \(warning)")
                                     .font(.footnote)
-                                    .foregroundStyle(.pocketWarning)
+                                    .foregroundStyle(Color.pocketWarning)
                             }
                         }
 
@@ -358,7 +358,7 @@ struct ModelDetailSheet: View {
                                 Spacer()
                             }
                             .font(.footnote)
-                            .foregroundStyle(.pocketPrimary)
+                            .foregroundStyle(Color.pocketPrimary)
                             .padding(.top, 10)
                         }
                     }

@@ -328,6 +328,32 @@ public actor AIEngine {
         eventContinuation?.yield(.modelUnloaded(modelId: modelId))
     }
 
+    /// Check whether the engine of a specific kind has a model loaded.
+    public func isReady(engineKind: ModelEngineKind) async -> Bool {
+        switch engineKind {
+        case .text:    return await textEngine?.isModelLoaded() ?? false
+        case .image:   return await imageEngine?.isModelLoaded() ?? false
+        case .vision:  return await visionEngine?.isModelLoaded() ?? false
+        case .speech:  return await speechEngine?.isModelLoaded() ?? false
+        case .tts:     return await ttsEngine?.isModelLoaded() ?? false
+        case .audio:   return await audioEngine?.isModelLoaded() ?? false
+        case .video:   return await videoEngine?.isModelLoaded() ?? false
+        }
+    }
+
+    /// Check the loaded model ID for a specific engine kind.
+    public func loadedModelId(engineKind: ModelEngineKind) async -> String? {
+        switch engineKind {
+        case .text:    return await textEngine?.loadedModelId()
+        case .image:   return await imageEngine?.loadedModelId()
+        case .vision:  return await visionEngine?.loadedModelId()
+        case .speech:  return await speechEngine?.loadedModelId()
+        case .tts:     return await ttsEngine?.loadedModelId()
+        case .audio:   return await audioEngine?.loadedModelId()
+        case .video:   return await videoEngine?.loadedModelId()
+        }
+    }
+
     // MARK: - Text Inference
 
     /// Generate text using the loaded text model.

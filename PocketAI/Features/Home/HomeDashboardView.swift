@@ -143,7 +143,7 @@ struct HomeDashboardView: View {
                 .padding(15)
                 .glassCard(cornerRadius: 12)
             } else {
-                ForEach(vm.loadedModels) { model in
+                ForEach(vm.loadedModels, id: \.id) { (model: ModelCatalogEntry) in
                     HStack(spacing: 12) {
                         EngineKindBadge(kind: model.engineKind)
                         
@@ -163,7 +163,7 @@ struct HomeDashboardView: View {
                             vm.unloadModel(model.id)
                         }) {
                             Image(systemName: "power")
-                                .foregroundStyle(.pocketError)
+                                .foregroundStyle(Color.pocketError)
                                 .padding(8)
                                 .background(Color.pocketError.opacity(0.12))
                                 .clipShape(Circle())

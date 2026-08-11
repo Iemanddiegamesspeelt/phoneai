@@ -265,7 +265,7 @@ public struct InferenceErrorView: View {
             if let suggestion = error.recoverySuggestion {
                 Text(suggestion)
                     .font(.caption)
-                    .foregroundStyle(.pocketPrimary)
+                    .foregroundStyle(Color.pocketPrimary)
                     .padding(8)
                     .background(Color.pocketPrimary.opacity(0.08))
                     .clipShape(RoundedRectangle(cornerRadius: 8))

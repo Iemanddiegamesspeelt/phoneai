@@ -27,7 +27,7 @@ struct SettingsDashboardView: View {
                 Button(role: .destructive, action: {
                     showResetAlert = true
                 }) {
-                    Label("Reset Models & Storage", systemName: "trash")
+                    Label("Reset Models & Storage", systemImage: "trash")
                 }
             }
 
