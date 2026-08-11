@@ -1,0 +1,69 @@
+# PocketAI native App dependency store
+PocketAI/Package.resolved
+PocketAI/.swiftpm
+
+# Xcode generated artefacts (we only want sources in git)
+*.xcworkspace
+*.xcodeproj/*
+!*.xcodeproj/project.yml
+!*.xcodeproj/project.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+*.xcodeproj/project.xcworkspace/xcuserdata
+*.xcodeproj/xcuserdata
+*.xcodeproj/project.xcworkspace/contents.xcworkspacedata
+
+# Derived data + build products
+DerivedData/
+build/
+*.o
+*.a
+*.framework/
+*.xcarchive
+*.ipa
+*.dSYM/
+*.dSYM
+
+# SPM cache
+.swiftpm/archive/
+.swiftpm/cache/
+.swiftpm/relaxed-cache/
+
+# Cocoapods / Carthage / Mint
+Carthage/
+Pods/
+Mintfile
+
+# macOS system artefacts
+.DS_Store
+.Trash/
+.Spotlight-V100
+.fseventsd
+
+# Secrets / provisioning (never commit these)
+*.mobileprovision
+*.p12
+*.pem
+*.p8
+*.cert
+*.certSigningRequest
+*.xcconfig.secret
+*.xcconfig.xcsecret
+*credentials*
+*secret*
+*signing*
+
+# Node / frontend tooling (if any)
+node_modules/
+*.tsbuildinfo
+.next/
+.turbo/
+
+# Editor swap/temp files
+*.swp
+*.swo
+*~
+*.tmp
+*.bak
+*.orig
+*.rej
+.idea/
+.vscode/

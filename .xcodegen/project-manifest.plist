@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Lightweight on-disk contract used by CI and packaging scripts. -->
+    <key>artifactType</key>
+    <string>ios_app</string>
+    <key>minOS</key>
+    <string>26.0</string>
+    <key>deploymentTarget</key>
+    <string>26.0</string>
+    <key>supportedArchs</key>
+    <array>
+        <string>arm64</string>
+    </array>
+    <key>deviceType</key>
+    <string>iphone,ipad</string>
+    <key>bundleID</key>
+    <string>com.pocketai.PocketAI</string>
+    <key>bundleVersion</key>
+    <string>1</string>
+    <key>shortVersion</key>
+    <string>1.0.0</string>
+    <key>xcode</key>
+    <string>26.0</string>
+    <key>swift</key>
+    <string>6.2</string>
+    <key>lastVerifiedBuildDate</key>
+    <string>2026-08-11</string>
+</dict>
+</plist>

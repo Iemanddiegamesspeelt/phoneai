@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>UILaunchStoryboardName</key>
+    <string>LaunchScreen</string>
+    <key>UIApplicationSceneManifest</key>
+    <dict>
+        <key>UIApplicationSupportsMultipleScenes</key>
+        <false/>
+    </dict>
+    <key>UIUserInterfaceStyle</key>
+    <string>Automatic</string>
+    <!-- Battery & Background -->
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>audio</string>
+        <string>processing</string>
+        <string>fetch</string>
+    </array>
+    <key>BGTaskSchedulerPermittedIdentifiers</key>
+    <array>
+        <string>com.pocketai.model-download</string>
+        <string>com.pocketai.model-optimization</string>
+    </array>
+    <!-- Privacy -->
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Pocket AI uses your microphone for local speech-to-text transcription. Audio never leaves your device.</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>Save generated images and audio to your photo library.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Analyze images with local vision models. Images are processed entirely on-device.</string>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>Pocket AI uses on-device speech recognition for transcription.</string>
+    <!-- Settings -->
+    <key>UIRequiresFullScreen</key>
+    <false/>
+    <key>UIStatusBarHidden</key>
+    <false/>
+    <key>UISupportsDocumentBrowser</key>
+    <true/>
+    <key>LSSupportsOpeningDocumentsInPlace</key>
+    <true/>
+    <key>UIFileSharingEnabled</key>
+    <true/>
+    <!-- Build -->
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>CFBundleName</key>
+    <string>Pocket AI Studio</string>
+    <key>CFBundleDisplayName</key>
+    <string>Pocket AI Studio</string>
+    <!-- URLs -->
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <false/>
+        <!-- Allow Hugging Face for model downloads -->
+        <key>NSExceptionDomains</key>
+        <dict>
+            <key>huggingface.co</key>
+            <dict>
+                <key>NSExceptionAllowsInsecureHTTPLoads</key>
+                <false/>
+                <key>NSIncludesSubdomains</key>
+                <true/>
+            </dict>
+        </dict>
+    </dict>
+    <!-- Document Types for model imports -->
+    <key>CFBundleDocumentTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeName</key>
+            <string>AI Model File</string>
+            <key>LSItemContentTypes</key>
+            <array>
+                <string>public.data</string>
+            </array>
+            <key>LSHandlerRank</key>
+            <string>Alternate</string>
+        </dict>
+    </array>
+    <!-- iOS 26: Foundation Models -->
+    <key>NSFoundationModelUsageDescription</key>
+    <string>Pocket AI Studio uses on-device AI models for local text generation, all processing happens privately on your device.</string>
+</dict>
+</plist>
