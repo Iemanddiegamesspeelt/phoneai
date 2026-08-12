@@ -83,8 +83,5 @@
             <string>Alternate</string>
         </dict>
     </array>
-    <!-- iOS 26: Foundation Models -->
-    <key>NSFoundationModelUsageDescription</key>
-    <string>Pocket AI Studio uses on-device AI models for local text generation, all processing happens privately on your device.</string>
 </dict>
 </plist>

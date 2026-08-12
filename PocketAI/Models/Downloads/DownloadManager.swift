@@ -5,31 +5,41 @@ import Foundation
 /// Manages model downloads using Apple's background URLSession.
 /// Downloads continue when the app is backgrounded (iOS permits background transfers).
 ///
-/// Features:
-/// - Background download support
-/// - Pause/resume/cancel/retry
-/// - Progress reporting via AsyncStream
-/// - Download queue with prioritization
-/// - Wi-Fi-only option
-/// - Insufficient storage pre-check
-public actor DownloadManager: NSObject {
+/// Uses a class (not actor) because URLSessionDownloadDelegate requires NSObject inheritance.
+/// Thread safety is ensured by serializing state mutations through @MainActor.
+public final class DownloadManager: NSObject, Sendable, URLSessionDownloadDelegate {
 
-    // MARK: - State
+    // MARK: - State (all access via MainActor)
 
-    private var activeTasks: [String: DownloadTask] = [:]  // keyed by modelId
-    private var urlSessionTasks: [String: URLSessionDownloadTask] = [:]
-    private var eventContinuation: AsyncStream<DownloadEvent>.Continuation?
-    private var session: URLSession!
-    private let storageManager: StorageManager
-    private var wifiOnly: Bool = false
+    @MainActor private var activeTasks: [String: DownloadTask] = [:]
+    @MainActor private var urlSessionTasks: [String: URLSessionDownloadTask] = [:]
+    @MainActor private var eventContinuation: AsyncStream<DownloadEvent>.Continuation?
 
     /// Stream of download events for UI observation.
-    public private(set) var events: AsyncStream<DownloadEvent>!
+    @MainActor public private(set) var events: AsyncStream<DownloadEvent>!
+
+    private let storageManager: StorageManager
+    private var session: URLSession!
+    @MainActor private var wifiOnly: Bool = false
+
+    // Pre-computed directory URL (Sendable-safe, set once in init)
+    private let downloadsDirectoryURL: URL
 
     // MARK: - Init
 
+    @MainActor
     public init(storageManager: StorageManager) {
         self.storageManager = storageManager
+
+        // Pre-resolve the downloads directory synchronously
+        let appSupport = FileManager.default.urls(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask
+        ).first!
+        self.downloadsDirectoryURL = appSupport
+            .appendingPathComponent("PocketAI", isDirectory: true)
+            .appendingPathComponent("downloads", isDirectory: true)
+
         super.init()
 
         var continuation: AsyncStream<DownloadEvent>.Continuation!
@@ -44,9 +54,6 @@ public actor DownloadManager: NSObject {
         )
         config.isDiscretionary = false
         config.sessionSendsLaunchEvents = true
-        if wifiOnly {
-            config.allowsCellularAccess = false
-        }
 
         self.session = URLSession(
             configuration: config,
@@ -58,6 +65,7 @@ public actor DownloadManager: NSObject {
     // MARK: - Public API
 
     /// Start downloading a model.
+    @MainActor
     public func download(
         modelId: String,
         modelName: String,
@@ -66,7 +74,7 @@ public actor DownloadManager: NSObject {
     ) async throws {
         // Pre-check: already downloading?
         if let existing = activeTasks[modelId], !existing.state.isTerminal {
-            return // Already in progress
+            return
         }
 
         // Pre-check: sufficient storage?
@@ -101,6 +109,7 @@ public actor DownloadManager: NSObject {
     }
 
     /// Pause a download.
+    @MainActor
     public func pause(modelId: String) {
         guard var task = activeTasks[modelId] else { return }
         urlSessionTasks[modelId]?.cancel(byProducingResumeData: { _ in })
@@ -110,6 +119,7 @@ public actor DownloadManager: NSObject {
     }
 
     /// Resume a paused download.
+    @MainActor
     public func resume(modelId: String) {
         guard var task = activeTasks[modelId], task.state == .paused else { return }
         task.state = .downloading
@@ -124,6 +134,7 @@ public actor DownloadManager: NSObject {
     }
 
     /// Cancel a download.
+    @MainActor
     public func cancel(modelId: String) {
         urlSessionTasks[modelId]?.cancel()
         urlSessionTasks.removeValue(forKey: modelId)
@@ -137,6 +148,7 @@ public actor DownloadManager: NSObject {
     }
 
     /// Retry a failed download.
+    @MainActor
     public func retry(modelId: String) async throws {
         guard let task = activeTasks[modelId] else { return }
         if case .failed = task.state {
@@ -151,43 +163,58 @@ public actor DownloadManager: NSObject {
     }
 
     /// Get the current state of all downloads.
+    @MainActor
     public func allTasks() -> [DownloadTask] {
         Array(activeTasks.values).sorted { ($0.startedAt ?? .distantPast) > ($1.startedAt ?? .distantPast) }
     }
 
     /// Get a specific download task.
+    @MainActor
     public func task(for modelId: String) -> DownloadTask? {
         activeTasks[modelId]
     }
 
     /// Set Wi-Fi-only mode.
+    @MainActor
     public func setWifiOnly(_ enabled: Bool) {
         wifiOnly = enabled
     }
 
     /// Clean up completed/failed/cancelled tasks.
+    @MainActor
     public func cleanup() {
         activeTasks = activeTasks.filter { !$0.value.state.isTerminal }
     }
-}
 
-// MARK: - URLSessionDownloadDelegate
+    // MARK: - URLSessionDownloadDelegate
 
-extension DownloadManager: URLSessionDownloadDelegate {
-
-    nonisolated public func urlSession(
+    public func urlSession(
         _ session: URLSession,
         downloadTask: URLSessionDownloadTask,
         didFinishDownloadingTo location: URL
     ) {
         guard let modelId = downloadTask.taskDescription else { return }
 
-        Task {
-            await handleDownloadComplete(modelId: modelId, tempLocation: location)
+        // Copy the file immediately (temp file is deleted after this method returns)
+        let destURL = downloadsDirectoryURL.appendingPathComponent("\(modelId).download")
+        do {
+            if FileManager.default.fileExists(atPath: destURL.path) {
+                try FileManager.default.removeItem(at: destURL)
+            }
+            try FileManager.default.copyItem(at: location, to: destURL)
+        } catch {
+            Task { @MainActor in
+                self.handleError(modelId: modelId, message: error.localizedDescription)
+            }
+            return
+        }
+
+        Task { @MainActor in
+            self.handleDownloadComplete(modelId: modelId, localURL: destURL)
         }
     }
 
-    nonisolated public func urlSession(
+    public func urlSession(
         _ session: URLSession,
         downloadTask: URLSessionDownloadTask,
         didWriteData bytesWritten: Int64,
@@ -196,8 +223,8 @@ extension DownloadManager: URLSessionDownloadDelegate {
     ) {
         guard let modelId = downloadTask.taskDescription else { return }
 
-        Task {
-            await handleProgress(
+        Task { @MainActor in
+            self.handleProgress(
                 modelId: modelId,
                 bytesWritten: totalBytesWritten,
                 totalBytes: totalBytesExpectedToWrite
@@ -205,7 +232,7 @@ extension DownloadManager: URLSessionDownloadDelegate {
         }
     }
 
-    nonisolated public func urlSession(
+    public func urlSession(
         _ session: URLSession,
         task: URLSessionTask,
         didCompleteWithError error: (any Error)?
@@ -213,43 +240,28 @@ extension DownloadManager: URLSessionDownloadDelegate {
         guard let error = error,
               let modelId = task.taskDescription else { return }
 
-        Task {
-            await handleError(modelId: modelId, error: error)
+        let nsError = error as NSError
+        if nsError.code == NSURLErrorCancelled { return }
+
+        Task { @MainActor in
+            self.handleError(modelId: modelId, message: error.localizedDescription)
         }
     }
 
-    // MARK: - Internal Handlers
+    // MARK: - Internal Handlers (MainActor)
 
-    private func handleDownloadComplete(modelId: String, tempLocation: URL) {
+    @MainActor
+    private func handleDownloadComplete(modelId: String, localURL: URL) {
         guard var task = activeTasks[modelId] else { return }
 
-        // Move file to downloads directory
-        let destURL = storageManager.downloadsDirectory
-            .appendingPathComponent("\(modelId).download")
+        task.state = .completed(localURL: localURL)
+        task.completedAt = Date()
+        activeTasks[modelId] = task
 
-        do {
-            if FileManager.default.fileExists(atPath: destURL.path) {
-                try FileManager.default.removeItem(at: destURL)
-            }
-            try FileManager.default.moveItem(at: tempLocation, to: destURL)
-
-            task.state = .completed(localURL: destURL)
-            task.completedAt = Date()
-            activeTasks[modelId] = task
-
-            eventContinuation?.yield(.completed(modelId: modelId, localURL: destURL))
-        } catch {
-            task.state = .failed(message: error.localizedDescription)
-            task.error = error.localizedDescription
-            activeTasks[modelId] = task
-
-            eventContinuation?.yield(.failed(
-                modelId: modelId,
-                error: InferenceError(.downloadFailed, message: error.localizedDescription)
-            ))
-        }
+        eventContinuation?.yield(.completed(modelId: modelId, localURL: localURL))
     }
 
+    @MainActor
     private func handleProgress(modelId: String, bytesWritten: Int64, totalBytes: Int64) {
         guard var task = activeTasks[modelId] else { return }
 
@@ -269,20 +281,17 @@ extension DownloadManager: URLSessionDownloadDelegate {
         ))
     }
 
-    private func handleError(modelId: String, error: any Error) {
+    @MainActor
+    private func handleError(modelId: String, message: String) {
         guard var task = activeTasks[modelId] else { return }
 
-        let nsError = error as NSError
-        // Don't report cancellation as an error
-        if nsError.code == NSURLErrorCancelled { return }
-
-        task.state = .failed(message: error.localizedDescription)
-        task.error = error.localizedDescription
+        task.state = .failed(message: message)
+        task.error = message
         activeTasks[modelId] = task
 
         eventContinuation?.yield(.failed(
             modelId: modelId,
-            error: InferenceError(.downloadFailed, message: error.localizedDescription)
+            error: InferenceError(.downloadFailed, message: message)
         ))
     }
 }

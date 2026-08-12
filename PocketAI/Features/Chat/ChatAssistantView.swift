@@ -113,10 +113,10 @@ struct ChatAssistantView: View {
                 }
                 .padding()
             }
-            .onChange(of: vm.chatHistory.count) { _ in
+            .onChange(of: vm.chatHistory.count) { _, _ in
                 scrollToBottom(proxy: proxy)
             }
-            .onChange(of: vm.chatHistory.last?.content) { _ in
+            .onChange(of: vm.chatHistory.last?.content) { _, _ in
                 scrollToBottom(proxy: proxy)
             }
         }

@@ -16,6 +16,15 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Select Xcode
+        run: |
+          # Use the latest Xcode available on the runner
+          sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer || \
+          sudo xcode-select -s /Applications/Xcode_16.1.app/Contents/Developer || \
+          sudo xcode-select -s /Applications/Xcode_16.0.app/Contents/Developer || \
+          sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+          xcodebuild -version
+
       - name: Install XcodeGen
         env:
           HOMEBREW_NO_AUTO_UPDATE: 1
@@ -33,11 +42,12 @@ jobs:
                      -scheme PocketAI \
                      -configuration Release \
                      -sdk iphonesimulator \
+                     -destination 'generic/platform=iOS Simulator' \
                      -derivedDataPath BuildData \
                      clean build \
                      CODE_SIGNING_ALLOWED=NO \
                      CODE_SIGNING_REQUIRED=NO \
-                     CODE_SIGN_IDENTITY="" > xcode_build.log 2>&1 || (cat xcode_build.log && exit 1)
+                     CODE_SIGN_IDENTITY="" 2>&1 | tail -100
 
       - name: Package IPA
         run: |

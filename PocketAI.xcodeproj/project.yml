@@ -2,34 +2,22 @@ name: PocketAI
 options:
   bundleIdPrefix: com.pocketai
   deploymentTarget:
-    iOS: "17.0"
-  xcodeVersion: "15.0"
-  createEmptyGroups: true
+    iOS: "18.0"
+  xcodeVersion: "16.0"
+  createIntermediateGroups: true
   generateEmptyDirectories: true
+
 configs:
   Debug: debug
   Release: release
-  Profile: release
-settingsTemplates:
-  debug:
+
+settingGroups:
+  signing:
     CODE_SIGN_IDENTITY: ""
-    CODE_SIGNING_REQUIRED: NO
-    CODE_SIGNING_ALLOWED: NO
+    CODE_SIGNING_REQUIRED: "NO"
+    CODE_SIGNING_ALLOWED: "NO"
     DEVELOPMENT_TEAM: ""
-    CURRENT_PROJECT_VERSION: "1"
-    VERSIONING_SYSTEM: "apple-generic"
-  release:
-    CODE_SIGN_IDENTITY: ""
-    CODE_SIGNING_REQUIRED: NO
-    CODE_SIGNING_ALLOWED: NO
-    DEVELOPMENT_TEAM: ""
-    CURRENT_PROJECT_VERSION: "1"
-  profile:
-    CODE_SIGN_IDENTITY: ""
-    CODE_SIGNING_REQUIRED: NO
-    CODE_SIGNING_ALLOWED: NO
-    DEVELOPMENT_TEAM: ""
-    CURRENT_PROJECT_VERSION: "1"
+
 targets:
   PocketAI:
     type: application
@@ -38,49 +26,51 @@ targets:
       - path: PocketAI
         excludes:
           - "**/*.md"
-      - path: PocketAI/Resources
+          - "Resources/**"
     resources:
       - path: PocketAI/Resources
         excludes:
           - "**/*.swift"
     settings:
+      groups:
+        - signing
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.pocketai.PocketAI
-        IPHONEOS_DEPLOYMENT_TARGET: "17.0"
+        IPHONEOS_DEPLOYMENT_TARGET: "18.0"
         TARGETED_DEVICE_FAMILY: "1,2"
         INFOPLIST_FILE: PocketAI/App/Info.plist
-        LD_RUNPATH_SEARCH_PATHS: $(inherited) "@executable_path/Frameworks"
+        CODE_SIGN_ENTITLEMENTS: PocketAI/App/PocketAI.entitlements
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
-        SWIFT_EMIT_LOC_STRINGS: YES
-        ENABLE_PREVIEWS: YES
-        GENERATE_INFOPLIST_FILE: NO
-        CLANG_ENABLE_MODULES: YES
+        SWIFT_EMIT_LOC_STRINGS: "YES"
+        ENABLE_PREVIEWS: "YES"
+        GENERATE_INFOPLIST_FILE: "NO"
+        CLANG_ENABLE_MODULES: "YES"
         SWIFT_OBJC_BRIDGING_HEADER: ""
-        SWIFT_VERSION: "5.9"
+        SWIFT_VERSION: "6.0"
+        CURRENT_PROJECT_VERSION: "1"
+        MARKETING_VERSION: "1.0.0"
       configs:
         Debug:
           SWIFT_OPTIMIZATION_LEVEL: "-Onone"
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: "DEBUG"
         Release:
           SWIFT_OPTIMIZATION_LEVEL: "-Owholemodule"
-        Profile:
-          SWIFT_OPTIMIZATION_LEVEL: "-Owholemodule"
+          SWIFT_COMPILATION_MODE: wholemodule
+
 schemes:
   PocketAI:
     build:
       targets:
-        PocketAI: [build, test, profile, analyze, archive]
+        PocketAI: [build, run, test, profile, analyze, archive]
       parallelizeBuild: true
       buildImplicitDependencies: true
     run:
       config: Debug
-      destination:
-        platform: iOS Simulator
     profile:
-      config: Profile
-      specifyBuildConfiguration: true
+      config: Release
     analyze:
       config: Debug
-      target: PocketAI
     archive:
       config: Release
