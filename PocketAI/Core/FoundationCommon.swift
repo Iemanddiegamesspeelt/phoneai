@@ -33,9 +33,9 @@ public typealias BoolCompletion = (Bool) -> Void
 
 /// A type-erased `Codable` wrapper for heterogeneous data in manifests and results.
 public struct AnyCodable: Codable, Sendable, Equatable, Hashable {
-    public let value: Any
+    public let value: Any & Sendable
 
-    public init(_ value: Any) {
+    public init(_ value: Any & Sendable) {
         self.value = value
     }
 

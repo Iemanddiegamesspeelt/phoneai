@@ -493,21 +493,6 @@ public actor AIEngine {
         }
     }
 
-    // MARK: - Status
-
-    /// Whether a model is loaded and ready for inference.
-    public func isReady(engineKind: ModelEngineKind) async -> Bool {
-        switch engineKind {
-        case .text:    return await textEngine?.isModelLoaded() ?? false
-        case .image:   return await imageEngine?.isModelLoaded() ?? false
-        case .vision:  return await visionEngine?.isModelLoaded() ?? false
-        case .speech:  return await speechEngine?.isModelLoaded() ?? false
-        case .tts:     return await ttsEngine?.isModelLoaded() ?? false
-        case .audio:   return await audioEngine?.isModelLoaded() ?? false
-        case .video:   return await videoEngine?.isModelLoaded() ?? false
-        }
-    }
-
     /// Get the current thermal state.
     public func currentThermalState() async -> ProcessInfo.ThermalState {
         await thermalMonitor.currentState

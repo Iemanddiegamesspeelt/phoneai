@@ -38,6 +38,7 @@ jobs:
 
       - name: Build App
         run: |
+          set -o pipefail
           xcodebuild -project PocketAI.xcodeproj \
                      -scheme PocketAI \
                      -configuration Release \
@@ -47,7 +48,7 @@ jobs:
                      clean build \
                      CODE_SIGNING_ALLOWED=NO \
                      CODE_SIGNING_REQUIRED=NO \
-                     CODE_SIGN_IDENTITY="" 2>&1 | tail -100
+                     CODE_SIGN_IDENTITY="" 2>&1 | tail -150
 
       - name: Package IPA
         run: |

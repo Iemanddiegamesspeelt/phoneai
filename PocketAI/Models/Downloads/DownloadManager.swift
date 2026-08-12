@@ -19,7 +19,7 @@ public final class DownloadManager: NSObject, Sendable, URLSessionDownloadDelega
     @MainActor public private(set) var events: AsyncStream<DownloadEvent>!
 
     private let storageManager: StorageManager
-    private var session: URLSession!
+    @MainActor private var session: URLSession!
     @MainActor private var wifiOnly: Bool = false
 
     // Pre-computed directory URL (Sendable-safe, set once in init)
