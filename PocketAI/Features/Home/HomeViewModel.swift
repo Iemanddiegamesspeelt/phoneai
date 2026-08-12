@@ -83,7 +83,7 @@ public final class HomeViewModel: ObservableObject {
     // MARK: - Settings
     @Published public var wifiOnlyDownloads = false {
         didSet {
-            Task { await downloadManager.setWifiOnly(wifiOnlyDownloads) }
+            Task { downloadManager.setWifiOnly(wifiOnlyDownloads) }
         }
     }
 
@@ -151,7 +151,7 @@ public final class HomeViewModel: ObservableObject {
 
     private func observeDownloadEvents() {
         downloadObservationsTask = Task {
-            for await event in await downloadManager.events {
+            for await event in downloadManager.events {
                 await handleDownloadEvent(event)
             }
         }
@@ -218,7 +218,7 @@ public final class HomeViewModel: ObservableObject {
         case .started(let modelId, let task):
             downloadTasks[modelId] = task
         case .progress(let modelId, _, _, _):
-            if let task = await downloadManager.task(for: modelId) {
+            if let task = downloadManager.task(for: modelId) {
                 downloadTasks[modelId] = task
             }
         case .completed(let modelId, let localURL):
@@ -233,11 +233,11 @@ public final class HomeViewModel: ObservableObject {
             downloadTasks.removeValue(forKey: modelId)
             triggerError(error)
         case .paused(let modelId):
-            if let task = await downloadManager.task(for: modelId) {
+            if let task = downloadManager.task(for: modelId) {
                 downloadTasks[modelId] = task
             }
         case .resumed(let modelId):
-            if let task = await downloadManager.task(for: modelId) {
+            if let task = downloadManager.task(for: modelId) {
                 downloadTasks[modelId] = task
             }
         case .cancelled(let modelId):
@@ -271,15 +271,15 @@ public final class HomeViewModel: ObservableObject {
     }
 
     public func pauseDownload(modelId: String) {
-        Task { await downloadManager.pause(modelId: modelId) }
+        Task { downloadManager.pause(modelId: modelId) }
     }
 
     public func resumeDownload(modelId: String) {
-        Task { await downloadManager.resume(modelId: modelId) }
+        Task { downloadManager.resume(modelId: modelId) }
     }
 
     public func cancelDownload(modelId: String) {
-        Task { await downloadManager.cancel(modelId: modelId) }
+        Task { downloadManager.cancel(modelId: modelId) }
     }
 
     public func deleteModel(modelId: String) {

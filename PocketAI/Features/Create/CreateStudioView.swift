@@ -115,8 +115,8 @@ struct CreateStudioView: View {
                             Text("512x512").tag(512)
                         }
                         .pickerStyle(.menu)
-                        .onChange(of: vm.imageWidth) { val in
-                            vm.imageHeight = val
+                        .onChange(of: vm.imageWidth) { _, newValue in
+                            vm.imageHeight = newValue
                         }
                     }
 

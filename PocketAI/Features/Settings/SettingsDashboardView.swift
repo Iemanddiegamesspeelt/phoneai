@@ -59,8 +59,8 @@ struct SettingsDashboardView: View {
             // Delete files in storage
             let fm = FileManager.default
             let storage = vm.aiEngine.storageManager
-            let modelsDir = await storage.modelsDirectory
-            let downloadsDir = await storage.downloadsDirectory
+            let modelsDir = storage.modelsDirectory
+            let downloadsDir = storage.downloadsDirectory
             
             try? fm.removeItem(at: modelsDir)
             try? fm.removeItem(at: downloadsDir)
