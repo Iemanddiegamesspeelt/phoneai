@@ -51,8 +51,18 @@ jobs:
 
       - name: Package IPA
         run: |
+          echo "=== Build Products Directory Content ==="
+          ls -la BuildData/Build/Products/
+          echo "=== Release-iphonesimulator Content ==="
+          ls -la BuildData/Build/Products/Release-iphonesimulator/ || echo "Directory not found"
+          
           mkdir -p Payload
-          cp -r BuildData/Build/Products/Release-iphonesimulator/PocketAI.app Payload/
+          cp -R BuildData/Build/Products/Release-iphonesimulator/PocketAI.app Payload/
+          
+          echo "=== Payload Content and Sizes ==="
+          du -sh Payload/
+          find Payload -maxdepth 4 -ls
+          
           zip -r PocketAI.ipa Payload
 
       - name: Upload IPA Artifact
