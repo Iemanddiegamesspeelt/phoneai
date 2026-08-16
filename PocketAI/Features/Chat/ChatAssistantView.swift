@@ -1,5 +1,6 @@
 import SwiftUI
 
+@MainActor
 struct ChatAssistantView: View {
     @ObservedObject var vm: HomeViewModel
     @State private var showParamsSheet = false

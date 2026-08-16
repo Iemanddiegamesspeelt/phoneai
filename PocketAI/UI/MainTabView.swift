@@ -1,5 +1,6 @@
 import SwiftUI
 
+@MainActor
 public struct MainTabView: View {
     @StateObject private var vm = HomeViewModel()
 

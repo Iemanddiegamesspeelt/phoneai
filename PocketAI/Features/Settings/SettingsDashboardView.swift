@@ -1,5 +1,6 @@
 import SwiftUI
 
+@MainActor
 struct SettingsDashboardView: View {
     @ObservedObject var vm: HomeViewModel
     @State private var showResetAlert = false

@@ -1,5 +1,6 @@
 import SwiftUI
 
+@MainActor
 struct CatalogListView: View {
     @ObservedObject var vm: HomeViewModel
     @State private var selectedFilter: FilterCategory = .all
@@ -230,6 +231,7 @@ struct CatalogListView: View {
 }
 
 // MARK: - Model Detail Sheet
+@MainActor
 struct ModelDetailSheet: View {
     let model: ModelCatalogEntry
     @ObservedObject var vm: HomeViewModel

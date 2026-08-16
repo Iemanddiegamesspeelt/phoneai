@@ -1,6 +1,7 @@
 import SwiftUI
 import PhotosUI
 
+@MainActor
 struct CreateStudioView: View {
     @ObservedObject var vm: HomeViewModel
     @State private var activeTab: StudioTab = .imageGen
