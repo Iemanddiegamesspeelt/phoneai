@@ -235,6 +235,22 @@ struct ModelDetailSheet: View {
     @ObservedObject var vm: HomeViewModel
     @Environment(\.dismiss) var dismiss
 
+    private var compatibilityResult: CompatibilityResult {
+        vm.modelCompatibilities[model.id] ?? .compatible
+    }
+    
+    private var isInstalled: Bool {
+        vm.installedModelIds.contains(model.id)
+    }
+    
+    private var isLoaded: Bool {
+        vm.loadedModelIds.contains(model.id)
+    }
+    
+    private var downloadTask: DownloadTask? {
+        vm.downloadTasks[model.id]
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -262,16 +278,15 @@ struct ModelDetailSheet: View {
                         Text("Hardware Compatibility")
                             .font(.headline)
                         
-                        let result = vm.modelCompatibilities[model.id] ?? .compatible
                         HStack(spacing: 8) {
-                            Image(systemName: result.statusIcon)
-                                .foregroundStyle(compatibilityColor(result))
-                            Text(result.statusLabel)
+                            Image(systemName: compatibilityResult.statusIcon)
+                                .foregroundStyle(compatibilityColor(compatibilityResult))
+                            Text(compatibilityResult.statusLabel)
                                 .fontWeight(.bold)
-                                .foregroundStyle(compatibilityColor(result))
+                                .foregroundStyle(compatibilityColor(compatibilityResult))
                         }
 
-                        if case .incompatible(let reasons) = result {
+                        if case .incompatible(let reasons) = compatibilityResult {
                             ForEach(reasons, id: \.self) { reason in
                                 Text("• \(reason)")
                                     .font(.footnote)
@@ -279,7 +294,7 @@ struct ModelDetailSheet: View {
                             }
                         }
 
-                        if case .marginal(let warnings) = result {
+                        if case .marginal(let warnings) = compatibilityResult {
                             ForEach(warnings, id: \.self) { warning in
                                 Text("• \(warning)")
                                     .font(.footnote)
@@ -300,10 +315,6 @@ struct ModelDetailSheet: View {
 
                     // Actions
                     VStack(spacing: 12) {
-                        let isInstalled = vm.installedModelIds.contains(model.id)
-                        let isLoaded = vm.loadedModelIds.contains(model.id)
-                        let downloadTask = vm.downloadTasks[model.id]
-
                         if isLoaded {
                             Button("Unload Model from RAM") {
                                 vm.unloadModel(model.id)

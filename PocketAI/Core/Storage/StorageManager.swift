@@ -8,10 +8,10 @@ import CryptoKit
 public actor StorageManager {
 
     /// The root directory for all installed models.
-    public let modelsDirectory: URL
+    nonisolated public let modelsDirectory: URL
 
     /// The root directory for in-progress downloads.
-    public let downloadsDirectory: URL
+    nonisolated public let downloadsDirectory: URL
 
     public init() {
         let appSupport = FileManager.default.urls(

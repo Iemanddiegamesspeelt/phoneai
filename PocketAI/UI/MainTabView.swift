@@ -22,9 +22,7 @@ public struct MainTabView: View {
                     Button("OK", role: .cancel) {}
                 },
                 message: {
-                    if let reason = vm.currentError?.failureReason {
-                        Text(reason)
-                    }
+                    Text(vm.currentError?.failureReason ?? "")
                 }
             )
     }
